@@ -41,7 +41,7 @@ fn main() {
         return;
     }
 
-    let listener = TcpListener::bind("127.0.0.1:25566").unwrap();
+    let listener = TcpListener::bind(format!("127.0.0.1:{}", port)).unwrap();
 
     for connection in listener.incoming() {
         match connection {

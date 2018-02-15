@@ -1,6 +1,6 @@
 [package]
-name = "bind-tcp"
-version = "0.1.0"
+name = "rust-bind-shell"
+version = "1.0.1"
 authors = ["Hayden Pope <stilbruch39@gmail.com>"]
 
 [dependencies]
