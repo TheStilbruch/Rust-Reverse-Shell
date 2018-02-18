@@ -1,4 +1,4 @@
 [root]
-name = "rust-bind-shell"
-version = "1.0.1"
+name = "rust-reverse-shell"
+version = "0.0.1"
 
